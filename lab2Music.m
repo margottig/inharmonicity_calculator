@@ -2,6 +2,8 @@ close all;
 clear all;
 clc;
 
+% TO DO:
+
 
 %% MEASUREMENTS OF SIGNALS
 % Data Flute A5
