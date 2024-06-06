@@ -53,7 +53,7 @@ nota2_Git = [522.9747	522.9747	1	1
 5.2297e+03	5.2518e+03	0.0271	1.0042 ];
 
 
-%% VALIDATION
+%% TEST VALIDATION
 % load nota_A3.mat
 % Amp_Flute_A5 =out.ModArm(1:8,3); 
 % F_real_Flute_A5 =out.ModArm(1:8,2);
@@ -75,12 +75,14 @@ F_real_Git_C5 =(nota2_Git(1:8,2));
 
 %% ----------------------------- Calculation of the spectral parameters----------------------
 % Pre-allocate output array for calculations
- instruments(2).frequency = F_real_Flute_C5;
- instruments(2).amplitude = Amp_Flute_C5;
- instruments(3).frequency = F_real_Git_A5;
- instruments(3).amplitude = Amp_Git_A5;
- instruments(4).frequency = F_real_Git_C5;
- instruments(4).amplitude = Amp_Git_C5;
+instruments(1).frequency = F_real_Flute_A5;
+instruments(1).amplitude = Amp_Flute_A5;
+instruments(2).frequency = F_real_Flute_C5;
+instruments(2).amplitude = Amp_Flute_C5;
+instruments(3).frequency = F_real_Git_A5;
+instruments(3).amplitude = Amp_Git_A5;
+instruments(4).frequency = F_real_Git_C5;
+instruments(4).amplitude = Amp_Git_C5;
 
 
 %% Spectral centroid brightness
@@ -112,15 +114,122 @@ for ii = 1:length(instruments)
   
 end
 
+
+%% TEST
+% figure(2);
+% plot(1:8, inh_results(:,1));
+% legend('Test note bassoon');
+% ylabel('Inharmonicity');
+% xlabel('Harmonic');
+% axis tight  % Fit the plot snugly to the data
+% ylim([-0.4 0.8])
+% axis([-0.0002 0.0008 ymin-(ymax-ymin)*0.1 ymax+(ymax-ymin)*0.1])  % Add 10% padding to top and bottom
+% grid on;
+
+
 figure(1);
-plot(1:8, inh_results(:,1));
-legend('note_1');
+plot(1:8, inh_results(:,1), 1:8, inh_results(:,2), 1:8, inh_results(:,3),1:8, inh_results(:,4));
+legend('Flute A5','Flute C5','Guitar A5','Guitar C5');
 ylabel('Inharmonicity');
 xlabel('Harmonic');
 axis tight  % Fit the plot snugly to the data
-ylim([-0.4 0.8])
-%axis([-0.0002 0.0008 ymin-(ymax-ymin)*0.1 ymax+(ymax-ymin)*0.1])  % Add 10% padding to top and bottom
+ylim([-0.004 0.008])
 grid on;
+
+
+%% --------------  3.1 COMPARISON AND ANALYSIS OF THE SPECTRAL PARAMETERS ----------------
+% a) difference in B greater betweem different notes played on the same
+% instrument
+
+% Define the spectral centroid values for each condition
+BC_flute_A5 = notes_centroids(1); 
+BC_flute_C5 = notes_centroids(2);
+BC_guitar_A5 = notes_centroids(3); 
+BA_guitar_C5 = notes_centroids(4);
+
+% Calculate the differences for the same instrument with different notes
+Delta_BC_flute = abs(BC_flute_A5 - BC_flute_C5);
+Delta_BC_guitar = abs(BC_guitar_A5 - BA_guitar_C5);
+
+% Calculate the differences for different instruments playing the same note
+Delta_BC_FluteGuitar_A5 = abs(BC_flute_A5 - BC_guitar_A5);
+Delta_BC_FluteGuitar_C5 = abs(BC_flute_C5 - BA_guitar_C5);
+
+% Display the results
+fprintf('Difference in B for Flute (different notes): %f\n', Delta_BC_flute);
+fprintf('Difference in B for Guitar (different notes): %f\n', Delta_BC_guitar);
+fprintf('Difference in B for A5 (different instruments): %f\n', Delta_BC_FluteGuitar_A5);
+fprintf('Difference in B for C5 (different instruments): %f\n', Delta_BC_FluteGuitar_C5);
+
+% Analyze which difference is greater
+if Delta_BC_flute > Delta_BC_FluteGuitar_A5 && Delta_BC_flute > Delta_BC_FluteGuitar_C5
+    fprintf('The difference in B is greater between different notes played on the same Flute.\n');
+elseif Delta_BC_guitar > Delta_BC_FluteGuitar_A5 && Delta_BC_guitar > Delta_BC_FluteGuitar_C5
+    fprintf('The difference in B is greater between different notes played on the same Guitar.\n');
+else
+    fprintf('The difference in B is greater between different instruments playing the same note.\n');
+end
+
+% Create a bar plot to visualize the differences
+figure;
+categories = {'Flute (A5-C5)', 'Guitar (A5-C5)', 'A5 (Diff Instruments)','C5 (Diff Instruments)'};
+values = [Delta_BC_flute, Delta_BC_guitar, Delta_BC_FluteGuitar_A5, Delta_BC_FluteGuitar_C5];
+
+bar(values);
+set(gca, 'XTickLabel', categories, 'XTickLabelRotation', 45);
+ylabel('Spectral Centroid Difference');
+title('Comparison of Spectral Centroid Differences');
+legend('Flute A5 vs C5', 'Guitar A5 vs C5', 'Flute vs Guitar A5', 'Flute vs Guitar C5', 'Location', 'northwest');
+grid on;
+
+
+
+% B)
+
+% Define the spectral centroid values for each condition
+BC1 = % Your calculated value for chordophone-note 1
+BA1 = % Your calculated value for aerophone-note 1
+BC2 = % Your calculated value for chordophone-note 2
+BA2 = % Your calculated value for aerophone-note 2
+
+% Calculate the average spectral centroid for the chordophone
+B_C_avg = (BC1 + BC2) / 2;
+
+% Calculate the average spectral centroid for the aerophone
+B_A_avg = (BA1 + BA2) / 2;
+
+% Display the average spectral centroid values
+fprintf('Average spectral centroid for chordophone: %f\n', B_C_avg);
+fprintf('Average spectral centroid for aerophone: %f\n', B_A_avg);
+
+% Determine which instrument has a higher spectral centroid value
+if B_C_avg > B_A_avg
+    fprintf('The chordophone has a higher average spectral centroid value.\n');
+else
+    fprintf('The aerophone has a higher average spectral centroid value.\n');
+end
+
+% Create a bar plot to visualize the average spectral centroid values
+figure;
+categories = {'Chordophone', 'Aerophone'};
+values = [B_C_avg, B_A_avg];
+
+bar(values);
+set(gca, 'XTickLabel', categories);
+ylabel('Average Spectral Centroid');
+title('Comparison of Average Spectral Centroid Values');
+grid on;
+
+
+
+
+
+
+
+
+
+
+
 
 
 %% -------------------------------FUNCTIONS--------------------
@@ -251,6 +360,10 @@ end
 function cent = freq_cent(f)
     cent = 3986.*log10(f);
 end
+
+
+
+
 
 
 
