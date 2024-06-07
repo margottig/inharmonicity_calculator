@@ -2,9 +2,6 @@ close all;
 clear all;
 clc;
 
-% TO DO:
-
-
 %% MEASUREMENTS OF SIGNALS
 % Data Flute A5
 nota2_Flute = [673.5802	673.5802	1	1
@@ -62,8 +59,18 @@ nota2_Git = [522.9747	522.9747	1	1
 % instruments(1).frequency = freq_cent(F_real_Flute_A5);
 % instruments(1).amplitude = Amp_Flute_A5;
 
+%% TASK 1:  SPECTRUM PLOT
+% Define the audio files and note names
+subfolder = 'lab2_notes';  % Replace with your subfolder name
 
-%  FLUTE eigenfrequencies fn, amplitudes An 
+audio_files = {fullfile(subfolder,'A5_Guitar.wav'), fullfile(subfolder,'C5_Guitar.wav'), ...
+               fullfile(subfolder,'A5_Flute.wav'), fullfile(subfolder,'C5_Flute.wav')};
+note_names = {'A5 Guitar', 'C5 Guitar', 'A5 Flute', 'C5 Flute'};
+
+% Call the function to plot the spectra
+plotSpectra(audio_files, note_names);
+
+%%  FLUTE eigenfrequencies fn, amplitudes An 
 Amp_Flute_A5 =(nota1_Flute(1:8,3)); 
 F_real_Flute_A5 =(nota1_Flute(1:8,2));
 Amp_Flute_C5 = (nota2_Flute(1:8,3));
@@ -92,6 +99,7 @@ notes_centroids = zeros(1, length(instruments));
 spectral_content_oddh_evenh = zeros(2, length(instruments));
 tristimulus_results = zeros(3, length(instruments));
 inh_results = zeros(8,length(instruments));
+even_h_results = zeros(1,length(instruments));
 
 %Loop through each instrument
 for ii = 1:length(instruments)
@@ -104,7 +112,8 @@ for ii = 1:length(instruments)
   
   % Call function to calculate spectral content (odd and even harmonics)
   % for each note
-  [even_h,odd_h] = harmonic_ratios(instruments(ii).amplitude);
+  [even_h,odd_h] = harmonic_ratios(instruments(ii).amplitude)
+  even_h_results(:,ii)=even_h;
   spectral_content_oddh_evenh(:,ii) = [even_h odd_h];
   
   % Tristimulus calculation
@@ -118,7 +127,7 @@ end
 
 
 %% TEST
-% figure(2);
+% figure();
 % plot(1:8, inh_results(:,1));
 % legend('Test note bassoon');
 % ylabel('Inharmonicity');
@@ -129,7 +138,7 @@ end
 % grid on;
 
 
-figure(1);
+figure();
 plot(1:8, inh_results(:,1), 1:8, inh_results(:,2), 1:8, inh_results(:,3),1:8, inh_results(:,4));
 legend('Flute A5','Flute C5','Guitar A5','Guitar C5');
 ylabel('Inharmonicity');
@@ -147,15 +156,15 @@ grid on;
 BC_flute_A5 = notes_centroids(1); 
 BC_flute_C5 = notes_centroids(2);
 BC_guitar_A5 = notes_centroids(3); 
-BA_guitar_C5 = notes_centroids(4);
+BC_guitar_C5 = notes_centroids(4);
 
 % Calculate the differences for the same instrument with different notes
 Delta_BC_flute = abs(BC_flute_A5 - BC_flute_C5);
-Delta_BC_guitar = abs(BC_guitar_A5 - BA_guitar_C5);
+Delta_BC_guitar = abs(BC_guitar_A5 - BC_guitar_C5);
 
 % Calculate the differences for different instruments playing the same note
 Delta_BC_FluteGuitar_A5 = abs(BC_flute_A5 - BC_guitar_A5);
-Delta_BC_FluteGuitar_C5 = abs(BC_flute_C5 - BA_guitar_C5);
+Delta_BC_FluteGuitar_C5 = abs(BC_flute_C5 - BC_guitar_C5);
 
 % Display the results
 fprintf('Difference in B for Flute (different notes): %f\n', Delta_BC_flute);
@@ -187,34 +196,27 @@ grid on;
 
 
 % B)
-
-% Define the spectral centroid values for each condition
-BC1 = % Your calculated value for chordophone-note 1
-BA1 = % Your calculated value for aerophone-note 1
-BC2 = % Your calculated value for chordophone-note 2
-BA2 = % Your calculated value for aerophone-note 2
-
 % Calculate the average spectral centroid for the chordophone
-B_C_avg = (BC1 + BC2) / 2;
+B_flute_avg = (BC_flute_A5 + BC_flute_C5) / 2;
 
 % Calculate the average spectral centroid for the aerophone
-B_A_avg = (BA1 + BA2) / 2;
+B_guitar_avg = (BC_guitar_A5 + BC_guitar_C5) / 2;
 
 % Display the average spectral centroid values
-fprintf('Average spectral centroid for chordophone: %f\n', B_C_avg);
-fprintf('Average spectral centroid for aerophone: %f\n', B_A_avg);
+fprintf('Average spectral centroid for the flute: %f\n', B_flute_avg);
+fprintf('Average spectral centroid for the guitar: %f\n', B_guitar_avg);
 
 % Determine which instrument has a higher spectral centroid value
-if B_C_avg > B_A_avg
-    fprintf('The chordophone has a higher average spectral centroid value.\n');
+if B_flute_avg > B_guitar_avg
+    fprintf('The flute has a higher average spectral centroid value.\n');
 else
-    fprintf('The aerophone has a higher average spectral centroid value.\n');
+    fprintf('The guitar has a higher average spectral centroid value.\n');
 end
 
 % Create a bar plot to visualize the average spectral centroid values
 figure;
-categories = {'Chordophone', 'Aerophone'};
-values = [B_C_avg, B_A_avg];
+categories = {'Flute', 'Guitar'};
+values = [B_flute_avg, B_guitar_avg];
 
 bar(values);
 set(gca, 'XTickLabel', categories);
@@ -222,150 +224,19 @@ ylabel('Average Spectral Centroid');
 title('Comparison of Average Spectral Centroid Values');
 grid on;
 
+%% C Which of the two instruments has a greater weight in the spectrum of even  harmonics?
+heven_C1=even_h_results(1,3); heven_A1=even_h_results(1,1);
+heven_C2=even_h_results(1,4); heven_A2=even_h_results(1,2);
 
+spectrum_Weight(heven_C1,heven_A1,heven_C2,heven_A2);
 
+%% D Define the Tristimulus values for each condition
+% tristimulus = each row one amplitude, each column one note
+% columns = flute_A5, Flute_C5, Guitar_A5, Guitar_C5
+T1_C1=tristimulus_results(1,1); T1_A1=tristimulus_results(1,2); T1_C2=tristimulus_results(1,3); T1_A2=tristimulus_results(1,4); 
+T2_C1=tristimulus_results(2,1); T2_A1=tristimulus_results(2,2); T2_C2=tristimulus_results(2,3); T2_A2=tristimulus_results(2,4); 
+T3_C1=tristimulus_results(3,1); T3_A1=tristimulus_results(3,2); T3_C2=tristimulus_results(3,3); T3_A2=tristimulus_results(3,4);
 
-
-
-
-
-
-
-
-
-
-%% -------------------------------FUNCTIONS--------------------
-%SPECTRAL CENTROID
-function B = spectral_centroid(frequencies, amplitudes)
-    % This function calculates the spectral centroid B
-    % Inputs:
-    %   frequencies - array of eigenfrequencies (f1, f2, ..., fN)
-    %   amplitudes - array of amplitudes (A1, A2, ..., AN)
-    % Output:
-    %   B - spectral centroid
-
-    % Check if inputs are vectors and have the same length
-    if ~isvector(frequencies) || ~isvector(amplitudes) || length(frequencies) ~= length(amplitudes)
-        error('Inputs must be vectors of the same length');
-    end
-
-    % Calculate the numerator and denominator of the spectral centroid formula
-    numerator = sum(frequencies .* amplitudes);
-    denominator = sum(amplitudes);
-
-    % Calculate the spectral centroid
-    B = numerator / denominator;
-end
-
-% Spectral content of odd and even harmonics
-function [even_h, odd_h] = harmonic_ratios(amplitudes)
-    % This function calculates the even and odd harmonic ratios
-    % Input:
-    %   amplitudes - array of amplitudes (A1, A2, ..., AN)
-    % Outputs:
-    %   even_h - even harmonic ratio
-    %   odd_h - odd harmonic ratio
-
-    % Number of harmonics
-    N = 8;
-
-    % Sum of squares of all amplitudes
-    total_power = sum(amplitudes.^2);
-
-    % Calculate the even harmonic ratio
-    even_indices = 2:2:N; % Indices of even harmonics
-    even_h = sum(amplitudes(even_indices).^2) / total_power;
-
-    % Calculate the odd harmonic ratio
-    odd_indices = 1:2:N; % Indices of odd harmonics
-    odd_h = sum(amplitudes(odd_indices).^2) / total_power;
-
-end
-
-function [T1, T2, T3] = tristimulus(amplitudes)
-    % This function calculates the tristimulus values T1, T2, T3
-    % Input:
-    %   amplitudes - array of amplitudes (A1, A2, ..., AN)
-    % Outputs:
-    %   T1 - Tristimulus value T1
-    %   T2 - Tristimulus value T2
-    %   T3 - Tristimulus value T3
-
-    % Check if input is a vector
-    if ~isvector(amplitudes)
-        error('Input must be a vector');
-    end
-
-    % Number of harmonics
-    N = length(amplitudes);
-
-    % Sum of squares of all amplitudes
-    total_power = sum(amplitudes.^2);
-
-    % Calculate T1
-    T1 = amplitudes(1)^2 / total_power;
-
-    % Calculate T2
-    if N > 1
-        T2 = sum(amplitudes(2:3).^2) / total_power;
-    else
-        T2 = 0;
-    end
-
-    % Calculate T3
-    if N > 3
-        T3 = sum(amplitudes(4:end).^2) / total_power;
-    else
-        T3 = 0;
-    end
-
-    % Ensure that T1 + T2 + T3 = 1
-    if abs(T1 + T2 + T3 - 1) > 1e-6
-        error('Tristimulus values do not sum to 1');
-    end
-end
-
-function [inh] = inharmonicity(harmonics, amplitudes)
-    % This function calculates the inharmonicity values
-    % Inputs:
-    %   frequencies - array of eigenfrequencies (f1, f2, ..., fN)
-    %   fundamental_frequency - the fundamental frequency f1
-    % Output:
-    %   inharmonicity - array of inharmonicity values for each harmonic
-
-    % Check if inputs are valid
-    if ~isvector(harmonics) || ~isvector(amplitudes)
-        error('Inputs must be a vector of frequencies and amplitudes');
-    end
-
-    k = [1,2,3,4,5]; %constants
-    n_num = 1:1:8;
-
-    %Calculate fc
-    f1 = harmonics(1); %fundamental frequency for each note
-    %k_th = k(jj); %kth harmonic
-    Ak = amplitudes(1:5);  % amplitude of the kth harmonic
-    DFk = harmonics(1:5) - k'.*f1; %Dfn
-    numerator = sum(Ak.*(DFk./(k'*f1)));
-    denominator = sum(Ak);
-    fc = f1 * (1 + (numerator/denominator));
-
-    % Calculate inharmonicity
-    fn = harmonics;
-    nfc = n_num*fc;
-
-    % Calculate inharmonicity for each harmonic
-    inh = (fn' -nfc ) ./ (n_num.*f1);
-end
-
-% CENTS Calculation
-function cent = freq_cent(f)
-    cent = 3986.*log10(f);
-end
-
-
-
-
-
-
+Ts = [T1_C1,T1_A1,T1_C2,T1_A2, T2_C1,T2_A1,T2_C2,T2_A2, T3_C1,T3_A1,T3_C2,T3_A2];
+plot_Tristimulus(Ts);
 
