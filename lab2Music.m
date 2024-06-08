@@ -1,6 +1,7 @@
 close all;
 clear all;
 clc;
+cd('inharmonicity_calculator'); % change into working directory
 
 %% MEASUREMENTS OF SIGNALS
 % Data Flute A5
@@ -61,7 +62,7 @@ nota2_Git = [522.9747	522.9747	1	1
 
 %% TASK 1:  SPECTRUM PLOT
 % Define the audio files and note names
-subfolder = 'lab2_notes';  % Replace with your subfolder name
+subfolder = 'bassoon_inharmonicity';  % Replace with your subfolder name
 
 audio_files = {fullfile(subfolder,'A5_Guitar.wav'), fullfile(subfolder,'C5_Guitar.wav'), ...
                fullfile(subfolder,'A5_Flute.wav'), fullfile(subfolder,'C5_Flute.wav')};
