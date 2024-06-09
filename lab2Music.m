@@ -140,8 +140,13 @@ end
 
 
 figure();
-plot(1:8, inh_results(:,1), 1:8, inh_results(:,2), 1:8, inh_results(:,3),1:8, inh_results(:,4));
-legend('Flute A5','Flute C5','Guitar A5','Guitar C5');
+plot(1:8, inh_results(:,3),'--', 'LineWidth',1);
+hold on
+plot(1:8, inh_results(:,4),'-','LineWidth', 1);
+plot(1:8, inh_results(:,1), '--', 'LineWidth', 1);
+plot(1:8, inh_results(:,2), '-', 'LineWidth', 1);
+hold off
+legend('Guitar A5','Guitar C5','Flute A5','Flute C5');
 ylabel('Inharmonicity');
 xlabel('Harmonic');
 axis tight  % Fit the plot snugly to the data
