@@ -5,3 +5,4 @@ musicalAcoustics/
 *.mp3
 test.m
 cello_audioFiles/
+results/*
