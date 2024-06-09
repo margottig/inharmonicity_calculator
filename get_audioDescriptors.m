@@ -41,8 +41,8 @@ for k = 1:length(audioFiles)
     inharmonicity_vector = mean(inharmonicity_matrix, 2);
     % Tristimulus calculation
     tristimulus_vector = harmonicEnergy(espectrograma);
-    % harmonic odd to even ratio / even harmonic ratios
-    [harmonicOddToEvenRatio_vector, even_harmonic_results] = harmonicOddToEvenRatio(espectrograma);
+    % harmonic odd to even ratio / even harmonic ratios (debug size vector)
+    % [harmonicOddToEvenRatio_vector, even_harmonic_results] = harmonicOddToEvenRatio(espectrograma); 
 
     %% Calculate Roughness
     roughness_value = get_Roughness(fullSignal,fs); 
@@ -99,7 +99,11 @@ for k = 1:length(audioFiles)
     sample_results.spectralSpread = spectralSpread;
     sample_results.roughness_value = roughness_value;
     sample_results.envolvente = envolvente;
-        
+    sample_results.f = f;
+    sample_results.t = t;
+    sample_results.inharmonicity_vector = inharmonicity_vector;
+    sample_results.tristimulus_vector = tristimulus_vector;
+
     save(filename_mat, 'sample_results');
 end
 
@@ -134,8 +138,8 @@ function [harmonicOddToEvenRatio_vector, even_harmonic_results]  = harmonicOddTo
         
         harmonicOddToEvenRatio_vector(:,ii) = [even_harmonics odd_harmonics];
         even_harmonic_results(:,ii) = even_harmonics;
-    end   
     end
+end
 
 function tristimulus_vector = harmonicEnergy(spectro)
 
