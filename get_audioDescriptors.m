@@ -36,11 +36,14 @@ for k = 1:length(audioFiles)
     spectralSpread = get_spectralSpread(espectrograma, fullCentroid,f);
     
     %% Calculate Harmonic Descriptors
-    % inharmonicity
+    % inharmonicity (given a spectrogram, calculates inharmonicity for each frame)
+    inharmonicity_matrix  = get_Inharmonicity_perFrame(espectrograma, t,f);
+    inharmonicity_vector = mean(inharmonicity_matrix, 2);
     % Tristimulus calculation
-    % harmonic odd to even ratio
-    % even harmonic ratios
-    
+    tristimulus_vector = harmonicEnergy(espectrograma);
+    % harmonic odd to even ratio / even harmonic ratios
+    [harmonicOddToEvenRatio_vector, even_harmonic_results] = harmonicOddToEvenRatio(espectrograma);
+
     %% Calculate Roughness
     roughness_value = get_Roughness(fullSignal,fs); 
 
@@ -101,15 +104,44 @@ for k = 1:length(audioFiles)
 end
 
 
-%% ----------------- FUNCTIONS ------------------
+
+
+%% ----------------- CALL FUNCTIONS ---------------------------------------
+% given a spectrogram, calculates spectral centroid, and so.. for each frame
+% assumes columns are frames, rows cover exactly the positive frequency range
 
 function centroidVector = b_spectralCentroid(spectro, f)
-%% given a spectrogram, calculates spectral centroid for each frame
-%% assumes columns are frames, rows cover exactly the positive frequency range
+
 centroidVector = zeros(1, width(spectro));
-for i = 1:length(centroidVector)
-    centroidVector(i) = spectral_centroid(f,spectro(:,i));
+for ii = 1:length(centroidVector)
+    centroidVector(ii) = spectral_centroid(f,spectro(:,ii));
 end
 end
 
+function [harmonicOddToEvenRatio_vector, even_harmonic_results]  = harmonicOddToEvenRatio(spectro)
+    %[even_harmonics, odd_harmonics]
+    harmonicOddToEvenRatio_vector = zeros(2, width(spectro));
+    even_harmonic_results = zeros(1,width(spectro));
+    
+    for ii = 1:width(harmonicOddToEvenRatio_vector)
+        total_power = sum(spectro(:,ii).^2);
+        % Calculate the even harmonic ratio
+        even_indices = 2:2:length(spectro); % Indices of even harmonics
+        even_harmonics = sum(spectro(even_indices,ii).^2) / total_power;
+        % Calculate the odd harmonic ratio
+        odd_indices = 1:2:length(spectro); % Indices of odd harmonics
+        odd_harmonics = sum(spectro(odd_indices,ii).^2) / total_power;
+        
+        harmonicOddToEvenRatio_vector(:,ii) = [even_harmonics odd_harmonics];
+        even_harmonic_results(:,ii) = even_harmonics;
+    end   
+    end
 
+function tristimulus_vector = harmonicEnergy(spectro)
+
+    tristimulus_vector = zeros(3, width(spectro));
+    for ii = 1:length(tristimulus_vector)
+        [T1, T2, T3] = tristimulus(spectro(:,ii));
+        tristimulus_vector(:,ii) = [T1 T2 T3];
+    end  
+end

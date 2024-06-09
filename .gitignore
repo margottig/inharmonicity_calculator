@@ -1,8 +1,7 @@
 musicalAcoustics/
 *.pdf
 *.docx
-*.wav
-*.mp3
 test.m
-cello_audioFiles/
 results/*
+audiofiles/*
+bassoon_inharmonicity/*.wav
