@@ -1,7 +1,7 @@
 close all;
 clear all;
 clc;
-cd('inharmonicity_calculator'); % change into working directory
+% cd('inharmonicity_calculator'); % change into working directory
 
 %% MEASUREMENTS OF SIGNALS
 % Data Flute A5
